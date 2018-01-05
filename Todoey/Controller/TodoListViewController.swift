@@ -13,36 +13,42 @@ class TodoListViewController: UITableViewController {
     var itemArray = [Item]()
     
     
+    //created our own plist at location data file path instead use UserDefaults
+    let dataFilepath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
-    let defaults = UserDefaults.standard
-
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        print(dataFilepath)
+        
         //因為重複使用cell 造成checkMark重複出現,所以使用dictionary增加一個checkMark 檢查用，並使用mvc
-        let newItem = Item()
-        newItem.title = "Find Mike"
-        itemArray.append(newItem)
+//        let newItem = Item()
+//        newItem.title = "Find Mike"
+//        itemArray.append(newItem)
+//
+//        let newItem2 = Item()
+//        newItem2.title = "Buy Eggos"
+//        itemArray.append(newItem2)
+//
+//        let newItem3 = Item()
+//        newItem3.title = "Destroy Demogorgon"
+//        itemArray.append(newItem3)
         
-        let newItem2 = Item()
-        newItem2.title = "Buy Eggos"
-        itemArray.append(newItem2)
-        
-        let newItem3 = Item()
-        newItem3.title = "Destroy Demogorgon"
-        itemArray.append(newItem3)
+        loadItems()
         
 
-        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
-        itemArray = items
-            
-        }
+//        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
+//        itemArray = items
+//
+//        }
         
     }
         
     
-    
-    //Mark- Tableview Datasource methods
+
+    //Mark: - Tableview Datasource methods
+    /***************************************************************/
+
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
@@ -82,7 +88,10 @@ class TodoListViewController: UITableViewController {
     }
     
     
-    //Mark - TableView Delegate Methods
+
+    //Mark: - TableView Delegate Methods
+    /***************************************************************/
+
     
     //感應TableView觸碰的方法
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -94,7 +103,7 @@ class TodoListViewController: UITableViewController {
         //use opposite
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
         
-//
+
 //        if itemArray[indexPath.row].done == false {
 //
 //            itemArray[indexPath.row].done = true
@@ -105,14 +114,17 @@ class TodoListViewController: UITableViewController {
 
         //forces the tableView to call data source method again
         
-        tableView.reloadData()
+        
+        saveItems()
+
     }
     
     
     
     
-    
-    //MARK - Add New Items
+    //MARK: - Add New Items
+    /***************************************************************/
+
     
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
@@ -130,10 +142,7 @@ class TodoListViewController: UITableViewController {
             
             self.itemArray.append(newItem)
             
-            self.defaults.set(self.itemArray, forKey: "TodoListArray")
-            
-            self.tableView.reloadData()
-            
+            self.saveItems()
         }
         
         alert.addTextField { (alertTextfield) in
@@ -141,14 +150,45 @@ class TodoListViewController: UITableViewController {
             TextField = alertTextfield
             
         }
-        
-        
+    
         alert.addAction(action)
         
         present(alert, animated: true, completion: nil)
         
     }
     
+    
+
+    //MARK: - Model Manupulation Methods (Codeable)
+    /***************************************************************/
+
+    
+    func saveItems(){
+        let encoder = PropertyListEncoder()
+        
+        do {
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilepath!)
+        }catch{
+            print("Error encoding item array, \(error)")
+        }
+        self.tableView.reloadData()
+    }
+    
+    func loadItems() {
+        
+        if let data = try? Data(contentsOf: dataFilepath!) {
+            
+            let decoder = PropertyListDecoder()
+            
+            do{
+                itemArray = try decoder.decode([Item].self, from: data)
+            }catch{
+                print("Error decoding item array, \(error)")
+            }
+
+        }
+    }
 
 
 }
