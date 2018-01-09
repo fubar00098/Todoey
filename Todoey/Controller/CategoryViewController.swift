@@ -7,18 +7,20 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class CategoryViewController: UITableViewController {
     
-    //連接coreData
-    var cateGoryArray = [Category]()
+    
+    //連接Realm
+    let realm = try! Realm()
+    
+    //變更data type to realm Resulm, (會auto update)
+    var cateGoryArray: Results<Category>!
     
     
     let dataFilepath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("cateGory.plist")
     
-    //created core data context
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,14 +36,17 @@ class CategoryViewController: UITableViewController {
     /****************************************/
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return cateGoryArray.count
+        
+        //Used "Nil Coalescing operator" to define what's to do if cateGoryAttay is nil
+        return cateGoryArray?.count ?? 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
         
-        
-        cell.textLabel?.text = cateGoryArray[indexPath.row].name
+        //Used "Nil Coalescing operator" to define what's to do if cateGoryAttay is nil
+        cell.textLabel?.text = cateGoryArray?[indexPath.row].name ?? "No Categories Added yet"
         
         return cell
     }
@@ -50,10 +55,13 @@ class CategoryViewController: UITableViewController {
     //MARK: - Data Manipulation Methods
     /****************************************/
 
-    func saveCategories(){
+    func save(category: Category){
         
         do{
-        try context.save()
+            //realm.write it's like update
+            try realm.write {
+                realm.add(category)
+            }
         }catch {
             print("Error saving context \(error)")
         }
@@ -64,14 +72,11 @@ class CategoryViewController: UITableViewController {
     
     func loadCategories(){
         
-       let reques: NSFetchRequest<Category> = Category.fetchRequest()
+        //pull out all of the items inside our realm in Category Object
+        //要注意，在realm 儲存傳回的是Results,所以要去開頭更改data type
+         cateGoryArray = realm.objects(Category.self)
         
-        do{
-        cateGoryArray = try context.fetch(reques)
-        } catch {
-            print("Error loading categories \(error)")
-        }
-        
+
         tableView.reloadData()
     }
     
@@ -91,11 +96,10 @@ class CategoryViewController: UITableViewController {
 
             print(textField.text!)
             
-            let newCategory = Category(context: self.context)
+            let newCategory = Category()
             newCategory.name = textField.text!
-            self.cateGoryArray.append(newCategory)
             
-            self.saveCategories()
+            self.save(category: newCategory)
             
             
             
@@ -130,7 +134,7 @@ class CategoryViewController: UITableViewController {
         //this will identify the current row that is selected (option binding)
         //選到的cell如果有值，就利用selectedCategory 從ToDoList儲存該cell的資料進來
         if let indexPath = tableView.indexPathForSelectedRow {
-                destinationVC.selectedCategory = cateGoryArray[indexPath.row]
+                destinationVC.selectedCategory = cateGoryArray?[indexPath.row]
             
         }
         
