@@ -8,27 +8,28 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
-class CategoryViewController: UITableViewController {
+
+class CategoryViewController: SwipeTableViewController{
     
     
     //連接Realm
     let realm = try! Realm()
     
     //變更data type to realm Resulm, (會auto update)
-    var cateGoryArray: Results<Category>!
+    var cateGoryArray: Results<Category>?
     
+    var color = ""
     
-    let dataFilepath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("cateGory.plist")
     
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
-        
         loadCategories()
-
+        
+        tableView.separatorStyle = .none
        
     }
     
@@ -41,12 +42,21 @@ class CategoryViewController: UITableViewController {
         return cateGoryArray?.count ?? 1
     }
     
+    
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         //Used "Nil Coalescing operator" to define what's to do if cateGoryAttay is nil
         cell.textLabel?.text = cateGoryArray?[indexPath.row].name ?? "No Categories Added yet"
+//
+//        let cellColor = UIColor.randomFlat.hexValue()
+//
+        cell.backgroundColor = UIColor(hexString: cateGoryArray?[indexPath.row].cellColor ?? "1D9BF6")
+        cell.textLabel?.textColor = ContrastColorOf(UIColor(hexString: (cateGoryArray?[indexPath.row].cellColor)!)!, returnFlat: true)
+        
+        
         
         return cell
     }
@@ -58,7 +68,7 @@ class CategoryViewController: UITableViewController {
     func save(category: Category){
         
         do{
-            //realm.write it's like update
+            //realm.write it's like update(commit change)
             try realm.write {
                 realm.add(category)
             }
@@ -81,6 +91,25 @@ class CategoryViewController: UITableViewController {
     }
     
     
+    //MARK: - Delete Data From Swipe
+    /****************************************/
+
+    
+    //this func can either call the superclass method or override it without the need for any of the superclass functionality
+    override func updateMode(at indexPath: IndexPath) {
+        if let categoryForDeletion = self.cateGoryArray?[indexPath.row]{
+
+            do{
+                try self.realm.write {
+                    self.realm.delete(categoryForDeletion)
+                }
+            }catch{
+                print("Error deleting catgory \(error)")
+            }
+        }
+    }
+    
+    
     
     //MARK: - Add New Categories
     /****************************************/
@@ -98,6 +127,9 @@ class CategoryViewController: UITableViewController {
             
             let newCategory = Category()
             newCategory.name = textField.text!
+            
+           newCategory.cellColor = UIColor.randomFlat.hexValue()
+            print(newCategory.cellColor)
             
             self.save(category: newCategory)
             
@@ -139,6 +171,9 @@ class CategoryViewController: UITableViewController {
         }
         
     }
-        
 
 }
+
+
+    
+

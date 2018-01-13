@@ -8,11 +8,14 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
-class TodoListViewController: UITableViewController {
+class TodoListViewController: SwipeTableViewController {
     
     var todoItems: Results<Item>?
     let realm = try! Realm()
+    
+    @IBOutlet weak var searchBar: UISearchBar!
     
     var selectedCategory: Category?{
         didSet {
@@ -26,28 +29,55 @@ class TodoListViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.rowHeight = 80
         
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
-        //因為重複使用cell 造成checkMark重複出現,所以使用dictionary增加一個checkMark 檢查用，並使用mvc
-//        let newItem = Item()
-//        newItem.title = "Find Mike"
-//        itemArray.append(newItem)
-//
-//        let newItem2 = Item()
-//        newItem2.title = "Buy Eggos"
-//        itemArray.append(newItem2)
-//
-//        let newItem3 = Item()
-//        newItem3.title = "Destroy Demogorgon"
-//        itemArray.append(newItem3)
+        tableView.separatorStyle = .none
+
+        
+    }
+    
+    //this code get caled just after viewDidLoad and show on the screen before.
+    override func viewWillAppear(_ animated: Bool) {
+        
+        title = selectedCategory!.name
+
+        guard let colourHex = selectedCategory?.cellColor else { fatalError()}
+        
+        updateNavBar(withHexCode: colourHex)
         
 
-
-//        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
-//        itemArray = items
-//
-//        }
+    }
+    
+    //當螢幕將要結束時呼叫，把顏色設為原本的藍色
+    
+//    override func viewWillDisappear(_ animated: Bool) {
+//       updateNavBar(withHexCode: "0080FF")
+//    }
+    
+    override func willMove(toParentViewController parent: UIViewController?) {
+        updateNavBar(withHexCode: "0080FF")
+    }
+        
+    
+    //MARK: - Nav Bar Setup Methods
+    
+    func updateNavBar(withHexCode colourHexCode: String) {
+        
+         //set value if the current navigationBar in the current navigationContriller, if it's nil than will crash than inform ourselves
+        guard let navBar = navigationController?.navigationBar else {fatalError("Navigation Controller does not exist.")}
+        
+        guard let navBarColour = UIColor(hexString: colourHexCode) else { fatalError() }
+        
+        navBar.barTintColor = navBarColour
+        
+        //按鈕顏色
+        navBar.tintColor = ContrastColorOf(navBarColour, returnFlat: true)
+        
+        //字體顏色
+        navBar.largeTitleTextAttributes = [NSAttributedStringKey.foregroundColor : ContrastColorOf(navBarColour, returnFlat: true)]
+        
+        searchBar.barTintColor = navBarColour
         
     }
         
@@ -64,14 +94,23 @@ class TodoListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         //確保如果沒有抓到資料 app不會崩潰
         if let item = todoItems?[indexPath.row] {
             
             cell.textLabel?.text = item.title
+
+            if let colour = UIColor(hexString: selectedCategory!.cellColor)?.darken(byPercentage: CGFloat(indexPath.row) / CGFloat(todoItems!.count)) {
+                
+                cell.backgroundColor = colour
+                cell.textLabel?.textColor = ContrastColorOf(colour, returnFlat: true)
+
+            }
             
+//            print("version1: \(CGFloat(indexPath.row / todoItems!.count))")
+//            print("version2: \(CGFloat(indexPath.row) / CGFloat(todoItems!.count))")
+
             
             //Ternary operatoe ==>
             //value = condition ? valueIfTrue : valueIfFalse
@@ -118,6 +157,25 @@ class TodoListViewController: UITableViewController {
             }
         }
             tableView.reloadData()
+    }
+    
+    
+    
+    //MARK: - Delete Data From Swipe
+    /****************************************/
+    
+    override func updateMode(at indexPath: IndexPath) {
+        
+        if let toDoListForDeletion = todoItems?[indexPath.row] {
+            do{
+                try realm.write {
+                    realm.delete(toDoListForDeletion)
+                }
+                }catch{
+                    print("Error deleting ToDoList \(error)")
+            }
+        }
+        
     }
     
     
@@ -192,7 +250,7 @@ extension TodoListViewController : UISearchBarDelegate {
 
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
-        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true)
+        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: false)
         
         tableView.reloadData()
         
