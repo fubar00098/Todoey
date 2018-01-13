@@ -190,9 +190,11 @@ class TodoListViewController: SwipeTableViewController {
         //use Global variable that alertTextfield can available show in UIAlertAction
         var TextField = UITextField()
         
-        let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Add New Item", message: "", preferredStyle: .alert)
         
-        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+        let canCelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
+        
+        let action = UIAlertAction(title: "Add", style: .default) { (action) in
             //What will happen once the user clicks the Add Item button on our UIAlert
             print(TextField.text!)
             
@@ -214,12 +216,14 @@ class TodoListViewController: SwipeTableViewController {
         }
         
         alert.addTextField { (alertTextfield) in
-            alertTextfield.placeholder = "Creat new item"
+            alertTextfield.placeholder = "Creat new Item"
             TextField = alertTextfield
             
         }
-    
+        
+        alert.addAction(canCelAction)
         alert.addAction(action)
+        
         
         present(alert, animated: true, completion: nil)
         

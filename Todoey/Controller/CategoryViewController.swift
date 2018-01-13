@@ -20,7 +20,9 @@ class CategoryViewController: SwipeTableViewController{
     //變更data type to realm Resulm, (會auto update)
     var cateGoryArray: Results<Category>?
     
-    var color = ""
+    var colorIndex = ""
+    
+    let colorArray = ["FACE49", "E67F38", "ECEFF1", "F5A841", "D3542E", "F0DEB4", "D5C295", "53BD9D", "46A086", "B7C9F1", "99ABD5"]
     
     
 
@@ -53,7 +55,7 @@ class CategoryViewController: SwipeTableViewController{
 //
 //        let cellColor = UIColor.randomFlat.hexValue()
 //
-        cell.backgroundColor = UIColor(hexString: cateGoryArray?[indexPath.row].cellColor ?? "1D9BF6")
+        cell.backgroundColor = UIColor(hexString: cateGoryArray?[indexPath.row].cellColor ?? "0080FF")
         cell.textLabel?.textColor = ContrastColorOf(UIColor(hexString: (cateGoryArray?[indexPath.row].cellColor)!)!, returnFlat: true)
         
         
@@ -118,9 +120,10 @@ class CategoryViewController: SwipeTableViewController{
         
         var textField = UITextField()
         
-       let alert =  UIAlertController(title: "Add New Todoey", message: "", preferredStyle: .alert)
+       let alert =  UIAlertController(title: "Add a New ", message: "", preferredStyle: .alert)
         
-        let action = UIAlertAction(title: "Add Here", style: .default) { (action) in
+        
+        let action = UIAlertAction(title: "Add", style: .default) { (action) in
             //What will happen once the user clicks the Add Item button on our UIAlert
 
             print(textField.text!)
@@ -128,21 +131,30 @@ class CategoryViewController: SwipeTableViewController{
             let newCategory = Category()
             newCategory.name = textField.text!
             
-           newCategory.cellColor = UIColor.randomFlat.hexValue()
-            print(newCategory.cellColor)
+            let randomIndex = Int(arc4random_uniform(UInt32(self.colorArray.count)))
+            let colorIndex = self.colorArray[randomIndex]
+            print(colorIndex)
+            
+            
+           newCategory.cellColor = colorIndex
+//            print(newCategory.cellColor)
             
             self.save(category: newCategory)
             
-            
-            
         }
         
+        let canCelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
+        
+        
         alert.addTextField { (alertTextfield) in
-            alertTextfield.placeholder = "Add a new Category"
+            alertTextfield.placeholder = "Add Here"
             textField = alertTextfield
         }
         
+        
+        alert.addAction(canCelAction)
         alert.addAction(action)
+       
         
         present(alert, animated: true, completion: nil)
         
