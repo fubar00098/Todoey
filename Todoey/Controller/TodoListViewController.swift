@@ -190,7 +190,7 @@ class TodoListViewController: SwipeTableViewController {
         //use Global variable that alertTextfield can available show in UIAlertAction
         var TextField = UITextField()
         
-        let alert = UIAlertController(title: "Add New Item", message: "", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Add a New Item", message: "", preferredStyle: .alert)
         
         let canCelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
         
@@ -216,7 +216,7 @@ class TodoListViewController: SwipeTableViewController {
         }
         
         alert.addTextField { (alertTextfield) in
-            alertTextfield.placeholder = "Creat new Item"
+            alertTextfield.placeholder = "Add Here"
             TextField = alertTextfield
             
         }
@@ -254,7 +254,7 @@ extension TodoListViewController : UISearchBarDelegate {
 
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
-        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: false)
+        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true)
         
         tableView.reloadData()
         

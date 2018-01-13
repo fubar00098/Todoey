@@ -1,6 +1,6 @@
 //
 //  CategoryViewController.swift
-//  Todoey
+//  Goldfish brain
 //
 //  Created by Spoke on 2018/1/6.
 //  Copyright © 2018年 Spoke. All rights reserved.
@@ -22,7 +22,7 @@ class CategoryViewController: SwipeTableViewController{
     
     var colorIndex = ""
     
-    let colorArray = ["FACE49", "E67F38", "ECEFF1", "F5A841", "D3542E", "F0DEB4", "D5C295", "53BD9D", "46A086", "B7C9F1", "99ABD5"]
+    let colorArray = ["FACE49", "E67F38", "ECEFF1", "F5A841", "F0DEB4", "D5C295", "53BD9D", "B7C9F1", "99ABD5", "A5C63B", "ECF0F1", "BDC3C7", "5065A1", "8E725E", "A38671"]
     
     
 
@@ -120,7 +120,7 @@ class CategoryViewController: SwipeTableViewController{
         
         var textField = UITextField()
         
-       let alert =  UIAlertController(title: "Add a New ", message: "", preferredStyle: .alert)
+       let alert =  UIAlertController(title: "Add a New Catrgory", message: "", preferredStyle: .alert)
         
         
         let action = UIAlertAction(title: "Add", style: .default) { (action) in

@@ -80,7 +80,7 @@
             </objects>
             <point key="canvasLocation" x="-486" y="134"/>
         </scene>
-        <!--Todoey-->
+        <!--Goldfish List-->
         <scene sceneID="veF-Yu-MUJ">
             <objects>
                 <tableViewController id="n26-GA-uqL" customClass="CategoryViewController" customModule="Todoey" customModuleProvider="target" sceneMemberID="viewController">
@@ -103,7 +103,7 @@
                             <outlet property="delegate" destination="n26-GA-uqL" id="ccy-1n-Jjw"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Todoey" id="PJb-Mg-vEN">
+                    <navigationItem key="navigationItem" title="Goldfish List" id="PJb-Mg-vEN">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="qHr-4C-yAs">
                             <color key="tintColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
