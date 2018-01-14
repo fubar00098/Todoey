@@ -108,6 +108,7 @@ class CategoryViewController: SwipeTableViewController{
             }catch{
                 print("Error deleting catgory \(error)")
             }
+            
         }
     }
     
@@ -180,7 +181,9 @@ class CategoryViewController: SwipeTableViewController{
         if let indexPath = tableView.indexPathForSelectedRow {
                 destinationVC.selectedCategory = cateGoryArray?[indexPath.row]
             
+                loadCategories()
         }
+        
         
     }
 
