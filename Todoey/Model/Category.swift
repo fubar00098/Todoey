@@ -1,6 +1,6 @@
 //
 //  Category.swift
-//  Todoey
+//  Goldfish List
 //
 //  Created by Spoke on 2018/1/7.
 //  Copyright © 2018年 Spoke. All rights reserved.

@@ -1,6 +1,6 @@
 //
 //  CategoryViewController.swift
-//  Goldfish brain
+//  Goldfish List
 //
 //  Created by Spoke on 2018/1/6.
 //  Copyright © 2018年 Spoke. All rights reserved.
